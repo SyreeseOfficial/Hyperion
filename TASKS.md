@@ -7,23 +7,23 @@
 
 ## Phase 0 — Foundation
 
-- [ ] **0.1** Init Next.js 15 project with TypeScript and Tailwind CSS (`npx create-next-app@latest`)
-- [ ] **0.2** Install all dependencies at once: `better-sqlite3 @types/better-sqlite3 framer-motion @dnd-kit/core @dnd-kit/sortable cmdk recharts lucide-react`
-- [ ] **0.3** Install and init shadcn/ui; add components: button, dialog, drawer, input, select, tabs, badge, scroll-area, separator, tooltip
-- [ ] **0.4** Create the SQLite DB init module: on app start, open `~/.hyperion/hyperion.db` and run `CREATE TABLE IF NOT EXISTS` for all tables — `sessions`, `tasks`, `archived_tasks`, `time_logs`, `notes`, `goals`, `goal_tasks`, `agents`, `contacts`, `contact_notes`, `contact_tasks`, `contact_goals`, `reading_items`, `briefings`
-- [ ] **0.5** Write out the full schema (columns + types) for every table as a single migration file before touching any UI
+- [x] **0.1** Init Next.js 15 project with TypeScript and Tailwind CSS (`npx create-next-app@latest`)
+- [x] **0.2** Install all dependencies at once: `better-sqlite3 @types/better-sqlite3 framer-motion @dnd-kit/core @dnd-kit/sortable cmdk recharts lucide-react`
+- [x] **0.3** Install and init shadcn/ui; add components: button, dialog, drawer, input, select, tabs, badge, scroll-area, separator, tooltip
+- [x] **0.4** Create the SQLite DB init module: on app start, open `~/.hyperion/hyperion.db` and run `CREATE TABLE IF NOT EXISTS` for all tables — `sessions`, `tasks`, `archived_tasks`, `time_logs`, `notes`, `goals`, `goal_tasks`, `agents`, `contacts`, `contact_notes`, `contact_tasks`, `contact_goals`, `reading_items`, `briefings`
+- [x] **0.5** Write out the full schema (columns + types) for every table as a single migration file before touching any UI
 
 ---
 
 ## Phase 1 — Design System
 
-- [ ] **1.1** Configure Tailwind theme: add CSS variables for `--gold`, `--obsidian`, `--ivory`, `--warm-gray`; wire gold intensity levels (subtle / moderate / bold) as a data attribute on `<html>`
-- [ ] **1.2** Load Cinzel and Inter via `next/font`; apply Cinzel to headings globally, Inter to body
-- [ ] **1.3** Build the app shell: fixed sidebar (left) + main content area. Sidebar has the HYPERION wordmark (Cinzel, gold), nav items (icon + label), and a Settings item pinned to the bottom
-- [ ] **1.4** Add sidebar collapse: toggle between expanded (wordmark + icon + label) and collapsed (icon-only strip with tooltip on hover). Persist preference to localStorage
-- [ ] **1.5** Build the `SectionHeader` component: left side = section name (Cinzel, gold) + epithet below it (small, muted); right side = slot for action buttons
-- [ ] **1.6** Build the `StatCard` component: glassy dark card, large bold number, small label below. Used in the Olympus stat strip
-- [ ] **1.7** Build the `EmptyState` component: Greek key border, placeholder illustration area, myth-flavored copy slot, action button slot
+- [x] **1.1** Configure Tailwind theme: add CSS variables for `--gold`, `--obsidian`, `--ivory`, `--warm-gray`; wire gold intensity levels (subtle / moderate / bold) as a data attribute on `<html>`
+- [x] **1.2** Load Cinzel and Inter via `next/font`; apply Cinzel to headings globally, Inter to body
+- [x] **1.3** Build the app shell: fixed sidebar (left) + main content area. Sidebar has the HYPERION wordmark (Cinzel, gold), nav items (icon + label), and a Settings item pinned to the bottom
+- [x] **1.4** Add sidebar collapse: toggle between expanded (wordmark + icon + label) and collapsed (icon-only strip with tooltip on hover). Persist preference to localStorage
+- [x] **1.5** Build the `SectionHeader` component: left side = section name (Cinzel, gold) + epithet below it (small, muted); right side = slot for action buttons
+- [x] **1.6** Build the `StatCard` component: glassy dark card, large bold number, small label below. Used in the Olympus stat strip
+- [x] **1.7** Build the `EmptyState` component: Greek key border, placeholder illustration area, myth-flavored copy slot, action button slot
 
 ---
 

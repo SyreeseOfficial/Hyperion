@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Gold intensity levels via data attribute on <html> */
+:root,
+[data-gold="subtle"] {
+  --gold: oklch(0.78 0.12 85);
+  --gold-muted: oklch(0.78 0.12 85 / 40%);
+  --gold-glow: oklch(0.78 0.12 85 / 15%);
+}
+[data-gold="moderate"] {
+  --gold: oklch(0.82 0.16 85);
+  --gold-muted: oklch(0.82 0.16 85 / 50%);
+  --gold-glow: oklch(0.82 0.16 85 / 20%);
+}
+[data-gold="bold"] {
+  --gold: oklch(0.86 0.20 85);
+  --gold-muted: oklch(0.86 0.20 85 / 65%);
+  --gold-glow: oklch(0.86 0.20 85 / 30%);
+}
+
+:root {
+  /* Hyperion palette */
+  --obsidian: oklch(0.10 0.005 250);
+  --obsidian-surface: oklch(0.14 0.005 250);
+  --obsidian-raised: oklch(0.17 0.005 250);
+  --ivory: oklch(0.96 0.012 90);
+  --warm-gray: oklch(0.55 0.008 80);
+
+  /* shadcn tokens — dark theme only, Hyperion is always dark */
+  --background: var(--obsidian);
+  --foreground: var(--ivory);
+  --card: var(--obsidian-surface);
+  --card-foreground: var(--ivory);
+  --popover: var(--obsidian-raised);
+  --popover-foreground: var(--ivory);
+  --primary: var(--gold);
+  --primary-foreground: var(--obsidian);
+  --secondary: var(--obsidian-raised);
+  --secondary-foreground: var(--ivory);
+  --muted: var(--obsidian-raised);
+  --muted-foreground: var(--warm-gray);
+  --accent: var(--obsidian-raised);
+  --accent-foreground: var(--gold);
+  --destructive: oklch(0.65 0.22 27);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: var(--gold-muted);
+  --radius: 0.5rem;
+
+  /* Charts */
+  --chart-1: var(--gold);
+  --chart-2: oklch(0.65 0.15 200);
+  --chart-3: oklch(0.65 0.15 140);
+  --chart-4: oklch(0.65 0.15 320);
+  --chart-5: oklch(0.65 0.15 30);
+
+  /* Sidebar (matches obsidian-surface) */
+  --sidebar: var(--obsidian-surface);
+  --sidebar-foreground: var(--ivory);
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: var(--obsidian);
+  --sidebar-accent: var(--obsidian-raised);
+  --sidebar-accent-foreground: var(--gold);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: var(--gold-muted);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-cinzel);
+  --font-mono: var(--font-geist-mono);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+  --color-gold-glow: var(--gold-glow);
+  --color-obsidian: var(--obsidian);
+  --color-obsidian-surface: var(--obsidian-surface);
+  --color-obsidian-raised: var(--obsidian-raised);
+  --color-ivory: var(--ivory);
+  --color-warm-gray: var(--warm-gray);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-cinzel);
+  }
+}
+
+/* Animation speed */
+[data-anim="off"] * { transition: none !important; animation: none !important; }
+[data-anim="reduced"] * { transition-duration: 50ms !important; animation-duration: 50ms !important; }
