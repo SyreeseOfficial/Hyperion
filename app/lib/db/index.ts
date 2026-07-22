@@ -87,6 +87,9 @@ function runMigrations(db: Database.Database) {
     CREATE TABLE IF NOT EXISTS agents (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
       name       TEXT    NOT NULL UNIQUE,
+      role       TEXT,
+      model      TEXT,
+      parent_id  INTEGER REFERENCES agents(id) ON DELETE SET NULL,
       created_at TEXT    NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -145,4 +148,13 @@ function runMigrations(db: Database.Database) {
       value      TEXT NOT NULL
     );
   `);
+
+  // ponytail: try/catch is the only way to do IF NOT EXISTS for ALTER TABLE in SQLite
+  for (const col of [
+    "ALTER TABLE agents ADD COLUMN role TEXT",
+    "ALTER TABLE agents ADD COLUMN model TEXT",
+    "ALTER TABLE agents ADD COLUMN parent_id INTEGER REFERENCES agents(id) ON DELETE SET NULL",
+  ]) {
+    try { db.exec(col); } catch {}
+  }
 }

@@ -11,6 +11,7 @@ import {
   Target,
   Users,
   BookOpen,
+  Network,
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
@@ -26,6 +27,7 @@ const NAV = [
   { href: "/goals",     label: "Themis",     icon: Target,          epithet: "Divine Law" },
   { href: "/contacts",  label: "Apollo",     icon: Users,           epithet: "The Oracle" },
   { href: "/reading",   label: "Iris",       icon: BookOpen,        epithet: "The Rainbow" },
+  { href: "/pantheon", label: "Pantheon",   icon: Network,         epithet: "The Council" },
 ];
 
 function navItemClass(active: boolean, extra = "") {

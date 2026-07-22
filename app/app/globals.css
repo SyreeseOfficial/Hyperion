@@ -132,4 +132,26 @@
 
 /* Animation speed */
 [data-anim="off"] * { transition: none !important; animation: none !important; }
+
+/* Pantheon org chart connectors */
+.org-level { display: flex; gap: 2rem; }
+.org-item  { position: relative; display: flex; flex-direction: column; align-items: center; }
+.org-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 50%;
+  height: 1px;
+  background: var(--gold-muted);
+}
+.org-item::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; right: 0;
+  height: 1px;
+  background: var(--gold-muted);
+}
+.org-item:first-child::before { display: none; }
+.org-item:last-child::after   { display: none; }
+.org-item:only-child::before,
+.org-item:only-child::after   { display: none; }
 [data-anim="reduced"] * { transition-duration: 50ms !important; animation-duration: 50ms !important; }
