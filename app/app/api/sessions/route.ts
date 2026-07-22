@@ -19,3 +19,8 @@ export async function POST(req: Request) {
   ).run(body);
   return Response.json(db.prepare("SELECT * FROM sessions WHERE id = ?").get(r.lastInsertRowid), { status: 201 });
 }
+
+export async function DELETE() {
+  getDb().prepare("DELETE FROM sessions").run();
+  return new Response(null, { status: 204 });
+}

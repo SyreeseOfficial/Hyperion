@@ -3,6 +3,7 @@ import { Cinzel, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Sidebar from "@/components/layout/Sidebar";
+import CommandPalette from "@/components/CommandPalette";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -40,6 +41,7 @@ export default function RootLayout({
         <TooltipProvider delay={300}>
           <Sidebar />
           <main className="flex-1 min-w-0 overflow-y-auto">{children}</main>
+          <CommandPalette />
         </TooltipProvider>
       </body>
     </html>

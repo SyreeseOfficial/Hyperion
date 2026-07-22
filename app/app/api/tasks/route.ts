@@ -41,3 +41,8 @@ export async function POST(req: Request) {
     });
   return Response.json(db.prepare("SELECT * FROM tasks WHERE id = ?").get(r.lastInsertRowid), { status: 201 });
 }
+
+export async function DELETE() {
+  getDb().prepare("DELETE FROM tasks").run();
+  return new Response(null, { status: 204 });
+}
