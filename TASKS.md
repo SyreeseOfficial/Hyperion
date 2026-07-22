@@ -29,30 +29,30 @@
 
 ## Phase 2 — Prometheus (AI Sessions)
 
-- [ ] **2.1** API routes: `GET /api/sessions` (list, sortable by any column), `POST /api/sessions` (create), `DELETE /api/sessions/[id]`
-- [ ] **2.2** Sessions table UI: columns = Date, Provider, Model, Duration, Tokens In, Tokens Out, Cost, Summary (truncated). All columns sortable by clicking header
-- [ ] **2.3** Accordion row expand: clicking a row expands inline to show full summary text + any extra fields. Clicking again collapses it
-- [ ] **2.4** "Log Session" button in the section header opens a modal. Fields: date, provider (select: Claude / OpenAI / Gemini / Other), model name, duration, tokens in, tokens out, cost, summary (textarea). Submit hits `POST /api/sessions`
+- [x] **2.1** API routes: `GET /api/sessions` (list, sortable by any column), `POST /api/sessions` (create), `DELETE /api/sessions/[id]`
+- [x] **2.2** Sessions table UI: columns = Date, Provider, Model, Duration, Tokens In, Tokens Out, Cost, Summary (truncated). All columns sortable by clicking header
+- [x] **2.3** Accordion row expand: clicking a row expands inline to show full summary text + any extra fields. Clicking again collapses it
+- [x] **2.4** "Log Session" button in the section header opens a modal. Fields: date, provider (select: Claude / OpenAI / Gemini / Other), model name, duration, tokens in, tokens out, cost, summary (textarea). Submit hits `POST /api/sessions`
 
 ---
 
 ## Phase 3 — Hermes (Tasks)
 
-- [ ] **3.1** API routes: `GET /api/tasks`, `POST /api/tasks`, `PATCH /api/tasks/[id]` (update fields or status), `DELETE /api/tasks/[id]`, `POST /api/tasks/[id]/archive`, `GET /api/tasks/archived`, `DELETE /api/tasks/archived/[id]`, `DELETE /api/tasks/archived` (bulk)
-- [ ] **3.2** Kanban board layout: 4 columns (Backlog, To Do, In Progress, Done) rendered side by side with horizontal scroll if needed
-- [ ] **3.3** Task card component: title, assignee badge, priority badge (Low / Medium / High with color), due date, total time logged, linked goal name (if any). Cards are tall enough to show all fields at a glance
-- [ ] **3.4** Task creation: "New Task" button in header opens a modal. Fields: title, assignee (select from agent roster + "Me"), priority, due date, linked goal, notes
-- [ ] **3.5** Drag-and-drop between columns using `@dnd-kit`. On drop, PATCH the task's status. Status dropdown on the card as a fallback (no drag needed)
-- [ ] **3.6** Filter bar above the board: filter by assignee and/or priority. Filters are additive. "Clear filters" resets
-- [ ] **3.7** Time tracking on task cards: start/stop timer button — on start, record timestamp; on stop, write a `time_logs` entry. Manual entry field (type minutes). Show total time on card face. Expandable log list inside the card detail view
-- [ ] **3.8** Done column archive flow: each Done card has an "Archive" button. "Clear all Done" bulk action at column top. Archive view is a separate drawer/page listing archived tasks with individual delete and "Delete all"
+- [x] **3.1** API routes: `GET /api/tasks`, `POST /api/tasks`, `PATCH /api/tasks/[id]` (update fields or status), `DELETE /api/tasks/[id]`, `POST /api/tasks/[id]/archive`, `GET /api/tasks/archived`, `DELETE /api/tasks/archived/[id]`, `DELETE /api/tasks/archived` (bulk)
+- [x] **3.2** Kanban board layout: 4 columns (Backlog, To Do, In Progress, Done) rendered side by side with horizontal scroll if needed
+- [x] **3.3** Task card component: title, assignee badge, priority badge (Low / Medium / High with color), due date, total time logged, linked goal name (if any). Cards are tall enough to show all fields at a glance
+- [x] **3.4** Task creation: "New Task" button in header opens a modal. Fields: title, assignee (select from agent roster + "Me"), priority, due date, linked goal, notes
+- [x] **3.5** Drag-and-drop between columns using `@dnd-kit`. On drop, PATCH the task's status. Status dropdown on the card as a fallback (no drag needed)
+- [x] **3.6** Filter bar above the board: filter by assignee and/or priority. Filters are additive. "Clear filters" resets
+- [x] **3.7** Time tracking on task cards: start/stop timer button — on start, record timestamp; on stop, write a `time_logs` entry. Manual entry field (type minutes). Show total time on card face. Expandable log list inside the card detail view
+- [x] **3.8** Done column archive flow: each Done card has an "Archive" button. "Clear all Done" bulk action at column top. Archive view is a separate drawer/page listing archived tasks with individual delete and "Delete all"
 
 ---
 
 ## Phase 4 — Mnemosyne (Notes)
 
-- [ ] **4.1** API routes: `GET /api/notes`, `POST /api/notes`, `DELETE /api/notes/[id]`, `DELETE /api/notes` (clear all)
-- [ ] **4.2** Notes UI: inline text input pinned to the top of the section. Below it, a chronological list of entries — each shows timestamp + text + a delete icon on hover. "Clear all" button with a confirmation dialog at the top right
+- [x] **4.1** API routes: `GET /api/notes`, `POST /api/notes`, `DELETE /api/notes/[id]`, `DELETE /api/notes` (clear all)
+- [x] **4.2** Notes UI: inline text input pinned to the top of the section. Below it, a chronological list of entries — each shows timestamp + text + a delete icon on hover. "Clear all" button with a confirmation dialog at the top right
 
 ---
 
