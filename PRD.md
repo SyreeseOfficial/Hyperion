@@ -6,16 +6,21 @@
 
 ## Overview
 
-Hyperion is a personal, locally-run dashboard serving as a unified command center for AI session tracking and personal productivity. Named after the Greek Titan of heavenly light, it combines AI observability (session logs, cost, tokens) with a Kanban task manager, goal tracking, and a lightweight scratchpad — all in one place, running on localhost.
+Hyperion is a personal, locally-run dashboard serving as a unified command center for AI session tracking and personal productivity. Named after the Greek Titan of heavenly light, it combines AI observability (session logs, cost, tokens) with a Kanban task manager, goal tracking, CRM, AI-summarized reading list, and a lightweight scratchpad — all in one place, running on localhost.
 
 ---
 
 ## Goals
 
 - Log and review AI sessions across multiple LLM providers (cost, tokens, duration, summaries)
-- Kanban task board with assignable named agents or self
+- Kanban task board with time tracking, assignable named agents or self
 - Goal tracking linked to Kanban tasks, with auto-derived progress
 - Lightweight persistent scratchpad notes
+- Lightweight CRM for professional and personal contacts
+- AI-summarized reading list (save URL → auto-summary via Claude)
+- Finance stat strip: net worth + delta, daily spend (via Monarch Money), business revenue
+- Calendar integration: today's events on Olympus (Google Calendar / iCal)
+- Morning briefing digest widget on Olympus (populated by external cron)
 - Greek-mythological identity that feels refined, not costume-y
 - No cloud dependency — runs entirely on the user's machine
 
@@ -103,8 +108,8 @@ Hyperion is a personal, locally-run dashboard serving as a unified command cente
 ### Command Palette (Cmd+K)
 - Global overlay
 - Jump to any section
-- Search tasks, notes, sessions by name
-- Quick-create: new task, new session log, scratchpad note
+- Search tasks, notes, sessions, contacts, reading items by name
+- Quick-create: new task, new session log, scratchpad note, new contact, save reading link
 
 ---
 
@@ -112,12 +117,14 @@ Hyperion is a personal, locally-run dashboard serving as a unified command cente
 
 | Section | Greek Name | Deity/Titan | Purpose |
 |---|---|---|---|
-| Overview | **Olympus** | Mount Olympus | Summary stats, charts, recent activity |
+| Overview | **Olympus** | Mount Olympus | Summary stats, charts, briefing, calendar, recent activity |
 | AI Sessions | **Prometheus** | Titan of fire/foresight | Log and review AI sessions |
-| Tasks | **Hermes** | Messenger god | Kanban task board with agent assignment |
+| Tasks | **Hermes** | Messenger god | Kanban task board with time tracking and agent assignment |
 | Notes | **Mnemosyne** | Goddess of memory | Persistent lightweight scratchpad |
 | Goals | **Themis** | Goddess of order & law | Goals with progress linked to Kanban tasks |
-| Settings | **Hephaestus** | God of the forge | Agent roster, appearance, data management |
+| CRM | **Apollo** | God of communication | Contacts, interaction logs, linked tasks and goals |
+| Reading List | **Iris** | Goddess of the rainbow / messenger | Save URLs, AI auto-summary via Claude |
+| Settings | **Hephaestus** | God of the forge | Agent roster, appearance, data management, integrations |
 
 ---
 
@@ -134,14 +141,22 @@ Hyperion is a personal, locally-run dashboard serving as a unified command cente
 | Total tokens | Same toggle |
 | Tasks in progress | Current |
 | Open goals | Current |
+| Hours today | Time logged across all tasks today |
+| Business revenue | Current month (manual entry; source TBD) |
 
-**Charts (below stat strip):**
+**Morning briefing card (below stat strip):**
+- Collapsible digest card populated by an external agent or scheduled job (not managed by Hyperion)
+- Hyperion provides a POST endpoint (`/api/briefing`) that the external job writes to
+- Card displays the latest stored briefing with its timestamp
+- Content sourcing (headlines, calendar, weather) deferred — to be handled by an AI agent later
+
+**Charts (below briefing):**
 - Cost over time (line/bar chart)
 - Token usage over time (input + output)
 - Tasks completed per day
 
 **Activity feed (below charts):**
-- Chronological feed of recent events across all sections (session logged, task moved, goal updated, note added)
+- Chronological feed of recent events across all sections (session logged, task moved, goal updated, note added, contact touched)
 - Auto-refreshes silently every 30–60 seconds
 
 ---
@@ -175,6 +190,13 @@ Hyperion is a personal, locally-run dashboard serving as a unified command cente
 - Due date (optional)
 - Linked goal (optional, from Themis)
 - Short notes (optional)
+- Time log (start/stop timer + manual entry)
+
+**Time tracking:**
+- Start/stop timer button on each card — logs a time entry with start + end
+- Manual time entry fallback (type duration)
+- Total time displayed on the card face
+- Multiple time entries per task (sessions accumulate)
 
 **Behaviors:**
 - Drag-and-drop cards between columns (`@dnd-kit`)
@@ -215,14 +237,73 @@ Hyperion is a personal, locally-run dashboard serving as a unified command cente
 
 ---
 
+### Apollo (CRM)
+
+**Purpose:** Lightweight contact manager for professional pipeline and personal network.
+
+**View:** Contact list with status filter tabs
+
+**Contact fields:**
+- Name
+- Company (optional)
+- Email / phone (optional)
+- Status: Prospect / Active / Cold / Archived
+- Notes (timestamped, per-contact log — similar to Mnemosyne but scoped to a contact)
+- Last-touched date (auto-updated when a note is logged)
+- Linked tasks (from Hermes)
+- Linked goals (from Themis)
+
+**Behaviors:**
+- "Log interaction" button on each contact → quick timestamped note by default; toggle to structured form (type: call / email / meeting / message + next-step field) when needed
+- Filter by status tab across the top
+- Quick-add contact from command palette
+- Search by name via command palette
+- Click contact → detail panel / drawer with full note history + linked tasks + linked goals
+
+---
+
+### Iris (Reading List)
+
+**Purpose:** Save URLs for later — Claude auto-summarizes them in the background.
+
+**View:** List of saved items, sorted by date added
+
+**Item fields:**
+- URL
+- Title (auto-fetched from page metadata, editable)
+- AI summary (one-sentence TL;DR — the hook, what makes it worth reading) — generated by Claude after save
+- Status: Pending / Summarized / Read / Archived
+- Date added
+
+**Behaviors:**
+- Quick-add URL from command palette or inline input at top
+- On save: item enters "Pending" state; a background job fetches the page and calls Claude to generate the summary, then updates status to "Summarized"
+- Summary displays inline on the list item (expandable)
+- Mark as Read / Archive per item
+- Search by title or summary content via command palette
+- Filter by status
+
+**AI summarization:**
+- Uses Claude (model configurable in Hephaestus)
+- For standard URLs: fetches page HTML, extracts body text, prompts Claude for a one-sentence TL;DR
+- For YouTube URLs: pulls transcript via YouTube transcript API, summarizes from transcript text
+- Runs via Next.js API route; requires `ANTHROPIC_API_KEY` in env
+
+---
+
 ### Hephaestus (Settings)
 
-Three sub-sections:
+Four sub-sections:
 
 **Agent Roster**
 - Named list of agents (e.g. "Claude Sonnet", "GPT-4o", "Research Bot")
 - Add / edit / delete agents
 - New agents can also be added inline when assigning a task in Hermes
+
+**Integrations**
+- **Anthropic API Key:** Used for Iris AI summarization
+- **Business revenue:** Manual entry for now; source TBD when income begins
+- **Calendar / Monarch / briefing sources:** Deferred — to be wired by an AI agent later; Hyperion exposes `/api/briefing` for external jobs to POST into
 
 **Appearance**
 - Sidebar default state (expanded / collapsed)
@@ -240,7 +321,21 @@ Three sub-sections:
 
 - **Database:** SQLite file at `~/.hyperion/hyperion.db`
 - **Access:** `better-sqlite3` via Next.js API routes
-- **Tables:** `sessions`, `tasks`, `notes`, `goals`, `goal_tasks` (join), `agents`, `archived_tasks`
+- **Tables:**
+  - `sessions` — Prometheus AI session logs
+  - `tasks` — Hermes Kanban cards
+  - `archived_tasks` — Hermes archived cards
+  - `time_logs` — Hermes per-task time entries (task_id, start, end, duration_minutes)
+  - `notes` — Mnemosyne scratchpad entries
+  - `goals` — Themis goal records
+  - `goal_tasks` — join table: goals ↔ tasks
+  - `agents` — Hephaestus agent roster
+  - `contacts` — Apollo CRM contacts
+  - `contact_notes` — Apollo per-contact timestamped interaction log
+  - `contact_tasks` — join table: contacts ↔ tasks
+  - `contact_goals` — join table: contacts ↔ goals
+  - `reading_items` — Iris saved URLs + AI summaries
+  - `briefings` — Olympus morning briefing payloads (latest wins)
 - **Backup:** User manually copies the `.db` file — no sync, no cloud
 
 ---
@@ -249,6 +344,13 @@ Three sub-sections:
 
 - Habits section
 - Live agent instrumentation / real-time monitoring
+- Chronos automations tab — scheduling is handled externally; Hyperion exposes endpoints for external jobs to write results into
+- Pantheon agent org chart tab — YAGNI until the agent roster grows meaningfully
+- Pomodoro / focus timer — use any browser timer
+- Calendar widget on Olympus — deferred to AI agent
+- Monarch Money integration — deferred to v2 or AI agent
+- Morning briefing content sourcing — deferred to AI agent (endpoint exists, population is external)
+- Productivity score — raw counts only, no calculated score
 - Multi-user / auth
 - Cloud sync or deployment
 - Mobile view
@@ -275,7 +377,20 @@ Three sub-sections:
 | Scratchpad scope | Persistent to SQLite, individual delete + clear-all button |
 | Goal progress | Auto progress bar from linked tasks + manual status toggle |
 | Olympus charts | Cost over time, token usage over time, tasks completed per day |
-| Settings | Agent roster + appearance tweaks + data management (its own section: Hephaestus) |
+| Settings | Agent roster + integrations + appearance + data management (Hephaestus) |
+| CRM scope | Full lightweight: contacts, status, quick-note log (structured form toggle), linked tasks + goals |
+| CRM companies | Field only on contact — no separate company records |
+| CRM ↔ sessions | Not linked — no client work yet |
+| Reading list | Save URL → Claude one-sentence TL;DR in background; YouTube uses transcript |
+| Time tracking | Start/stop timer + manual entry per task card; rolls up to Olympus "Hours today" stat |
+| Productivity score | Skipped — raw counts only (tasks done, sessions logged) |
+| Finance stats | Business revenue placeholder stat (manual entry; Monarch + sources deferred) |
+| Calendar | Deferred to AI agent |
+| Monarch Money | Deferred to v2 or AI agent |
+| Morning briefing | External agent POSTs to `/api/briefing`; Olympus displays latest stored payload |
+| Olympus density | Clean and minimal — key numbers, expand what you need |
+| Automations | Handled externally; Hyperion is the display layer, not the scheduler |
+| Agent org chart | Deferred (YAGNI) — Hephaestus roster is sufficient for now |
 
 ---
 
