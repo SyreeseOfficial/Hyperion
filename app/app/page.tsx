@@ -90,6 +90,15 @@ export default function OlympusPage() {
         }
       />
 
+      {/* Mission Statement */}
+      <div className="rounded-lg border border-gold/30 bg-gold-glow px-5 py-4 flex flex-col gap-1.5">
+        <p className="text-[10px] font-semibold text-gold uppercase tracking-widest font-heading">Mission</p>
+        <p className="text-base font-bold text-ivory leading-snug">
+          Get PushRise to $5,200/month. Quit the truck. Everything that doesn&apos;t move that needle is noise.
+        </p>
+        <p className="text-xs text-warm-gray">One project. One focus. The only wasted day is one you didn&apos;t ship.</p>
+      </div>
+
       {/* Morning briefing */}
       {briefing && (
         <div className="rounded-lg border border-gold-muted/30 bg-gold-glow p-4 flex flex-col gap-2">

@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Sidebar from "@/components/layout/Sidebar";
 import CommandPalette from "@/components/CommandPalette";
+import SettingsApplicator from "@/components/SettingsApplicator";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -39,6 +40,7 @@ export default function RootLayout({
     >
       <body className="h-full flex bg-obsidian text-ivory">
         <TooltipProvider delay={300}>
+          <SettingsApplicator />
           <Sidebar />
           <main className="flex-1 min-w-0 overflow-y-auto">{children}</main>
           <CommandPalette />

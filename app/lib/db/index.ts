@@ -1,16 +1,12 @@
 import Database from "better-sqlite3";
 import path from "path";
-import os from "os";
-import fs from "fs";
 
-const DB_DIR = path.join(os.homedir(), ".hyperion");
-const DB_PATH = path.join(DB_DIR, "hyperion.db");
+const DB_PATH = path.join(process.cwd(), "..", "hyperion.db");
 
 let _db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (_db) return _db;
-  fs.mkdirSync(DB_DIR, { recursive: true });
   _db = new Database(DB_PATH);
   _db.pragma("journal_mode = WAL");
   _db.pragma("foreign_keys = ON");

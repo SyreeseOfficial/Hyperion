@@ -8,7 +8,7 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
-import { GripVertical, Plus } from "lucide-react";
+import { GripVertical, Plus, Network, LayoutGrid } from "lucide-react";
 import { SectionHeader } from "@/components/ui-custom/SectionHeader";
 import { EmptyState } from "@/components/ui-custom/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -176,12 +176,20 @@ export default function PantheonPage() {
   const [editForm, setEditForm] = useState(EMPTY_FORM);
   const [adding, setAdding] = useState(false);
   const [addForm, setAddForm] = useState(EMPTY_FORM);
+  const [view, setView] = useState<"hierarchy" | "list">("hierarchy");
 
   function loadAgents() {
     fetch("/api/agents").then((r) => r.json()).then(setAgents);
   }
 
-  useEffect(() => { loadAgents(); }, []);
+  useEffect(() => {
+    loadAgents();
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((s: Record<string, string>) => {
+        if (s.pantheon_view === "list") setView("list");
+      });
+  }, []);
 
   function openEdit(agent: Agent) {
     setEditing(agent);
@@ -269,38 +277,47 @@ export default function PantheonPage() {
           title="Pantheon"
           epithet="The Council"
           actions={
-            <Button size="sm" onClick={() => setAdding(true)}>
-              <Plus size={14} className="mr-1" /> Add Agent
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={() => setView(view === "hierarchy" ? "list" : "hierarchy")}>
+                {view === "hierarchy" ? <LayoutGrid size={14} /> : <Network size={14} />}
+              </Button>
+              <Button size="sm" onClick={() => setAdding(true)}>
+                <Plus size={14} className="mr-1" /> Add Agent
+              </Button>
+            </div>
           }
         />
 
         <div className="mt-6">
-          <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {agents.length === 0 ? (
-              <EmptyState
-                copy="No agents in the council yet. Add your first divine operative."
-                action={<Button onClick={() => setAdding(true)}>Add Agent</Button>}
-              />
-            ) : (
-              <>
-                <RootDropZone draggingId={draggingId} />
-                <div className="overflow-auto pb-8">
-                  <div className="flex gap-16 justify-center min-w-fit pt-2">
-                    {roots.map((root) => (
-                      <OrgBranch
-                        key={root.id}
-                        agent={root}
-                        allAgents={agents}
-                        draggingId={draggingId}
-                        onEdit={openEdit}
-                      />
-                    ))}
-                  </div>
+          {agents.length === 0 ? (
+            <EmptyState
+              copy="No agents in the council yet. Add your first divine operative."
+              action={<Button onClick={() => setAdding(true)}>Add Agent</Button>}
+            />
+          ) : view === "list" ? (
+            <div className="flex flex-wrap gap-4">
+              {agents.map((agent) => (
+                <AgentCard key={agent.id} agent={agent} allAgents={agents} draggingId={null} onEdit={openEdit} />
+              ))}
+            </div>
+          ) : (
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+              <RootDropZone draggingId={draggingId} />
+              <div className="overflow-auto pb-8">
+                <div className="flex gap-16 justify-center min-w-fit pt-2">
+                  {roots.map((root) => (
+                    <OrgBranch
+                      key={root.id}
+                      agent={root}
+                      allAgents={agents}
+                      draggingId={draggingId}
+                      onEdit={openEdit}
+                    />
+                  ))}
                 </div>
-              </>
-            )}
-          </DndContext>
+              </div>
+            </DndContext>
+          )}
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SectionHeader } from "@/components/ui-custom/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,30 +19,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, Plus, Download, Eye, EyeOff } from "lucide-react";
+import { Trash2, Plus, Download, Upload, Eye, EyeOff, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PageMotion from "@/components/PageMotion";
 
 type Agent = { id: number; name: string };
 
-const DB_PATH = `${typeof window !== "undefined" && navigator.userAgent.includes("Linux") ? "~" : "~"}/.hyperion/hyperion.db`;
+const SHORTCUTS = [
+  { keys: ["Ctrl", "K"], label: "Open command palette" },
+  { keys: ["Esc"], label: "Close palette / cancel edit" },
+  { keys: ["Enter"], label: "Confirm inline edit" },
+  { keys: ["↑", "↓"], label: "Navigate palette results" },
+];
 
 export default function SettingsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [newAgent, setNewAgent] = useState("");
   const [editingAgent, setEditingAgent] = useState<{ id: number; name: string } | null>(null);
 
-  const [settings, setSettings] = useState<Record<string, string>>({});
   const [apiKey, setApiKey] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [revenue, setRevenue] = useState("");
+  const [userName, setUserName] = useState("");
 
   const [goldIntensity, setGoldIntensity] = useState<"subtle" | "moderate" | "bold">("subtle");
   const [animSpeed, setAnimSpeed] = useState<"normal" | "reduced" | "off">("normal");
   const [sidebarDefault, setSidebarDefault] = useState<"expanded" | "collapsed">("expanded");
+  const [density, setDensity] = useState<"normal" | "compact">("normal");
+  const [pantheonView, setPantheonView] = useState<"hierarchy" | "list">("hierarchy");
 
   const [confirmClear, setConfirmClear] = useState<string | null>(null);
   const [savedMsg, setSavedMsg] = useState("");
+  const [importMsg, setImportMsg] = useState("");
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   function loadAgents() {
     fetch("/api/agents").then((r) => r.json()).then(setAgents);
@@ -50,12 +60,14 @@ export default function SettingsPage() {
 
   function loadSettings() {
     fetch("/api/settings").then((r) => r.json()).then((s: Record<string, string>) => {
-      setSettings(s);
       if (s.anthropic_api_key) setApiKey(s.anthropic_api_key);
       if (s.revenue) setRevenue(s.revenue);
+      if (s.user_name) setUserName(s.user_name);
       if (s.gold_intensity) setGoldIntensity(s.gold_intensity as typeof goldIntensity);
       if (s.anim_speed) setAnimSpeed(s.anim_speed as typeof animSpeed);
       if (s.sidebar_default) setSidebarDefault(s.sidebar_default as typeof sidebarDefault);
+      if (s.density) setDensity(s.density as typeof density);
+      if (s.pantheon_view) setPantheonView(s.pantheon_view as typeof pantheonView);
     });
   }
 
@@ -114,9 +126,21 @@ export default function SettingsPage() {
     saveSettings({ anim_speed: v });
   }
 
+  function applyDensity(v: typeof density) {
+    setDensity(v);
+    if (v === "compact") document.documentElement.setAttribute("data-density", "compact");
+    else document.documentElement.removeAttribute("data-density");
+    saveSettings({ density: v });
+  }
+
   function applySidebarDefault(v: typeof sidebarDefault) {
     setSidebarDefault(v);
     saveSettings({ sidebar_default: v });
+  }
+
+  function applyPantheonView(v: typeof pantheonView) {
+    setPantheonView(v);
+    saveSettings({ pantheon_view: v });
   }
 
   async function clearSection(section: string) {
@@ -130,6 +154,26 @@ export default function SettingsPage() {
     };
     await fetch(endpoints[section], { method: "DELETE" });
     setConfirmClear(null);
+  }
+
+  async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const res = await fetch("/api/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const { imported } = await res.json() as { imported: number };
+      setImportMsg(`Imported ${imported} records`);
+    } catch {
+      setImportMsg("Import failed — invalid JSON");
+    }
+    setTimeout(() => setImportMsg(""), 3000);
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   const SECTIONS = ["sessions", "tasks", "notes", "goals", "contacts", "reading"];
@@ -202,6 +246,20 @@ export default function SettingsPage() {
         <h2 className="text-sm font-heading font-semibold text-gold">Integrations</h2>
 
         <div className="flex flex-col gap-1">
+          <label className="text-xs text-warm-gray">Your Name</label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="e.g. Syreese"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="max-w-48 text-sm"
+            />
+            <Button size="sm" onClick={() => saveSettings({ user_name: userName })}>Save</Button>
+          </div>
+          <p className="text-xs text-warm-gray">Used in Olympus greeting.</p>
+        </div>
+
+        <div className="flex flex-col gap-1">
           <label className="text-xs text-warm-gray">Anthropic API Key</label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -249,7 +307,7 @@ export default function SettingsPage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-heading font-semibold text-gold">Appearance</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-warm-gray">Gold Intensity</label>
             <Select value={goldIntensity} onValueChange={(v) => applyGold(v as typeof goldIntensity)}>
@@ -284,9 +342,59 @@ export default function SettingsPage() {
               </SelectContent>
             </Select>
           </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-warm-gray">Density</label>
+            <Select value={density} onValueChange={(v) => applyDensity(v as typeof density)}>
+              <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="normal">Normal</SelectItem>
+                <SelectItem value="compact">Compact</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-warm-gray">Pantheon Default View</label>
+          <Select value={pantheonView} onValueChange={(v) => applyPantheonView(v as typeof pantheonView)}>
+            <SelectTrigger className="text-sm max-w-48"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="hierarchy">Hierarchy (org chart)</SelectItem>
+              <SelectItem value="list">List (flat grid)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {savedMsg && <p className="text-xs text-emerald-400">{savedMsg}</p>}
+      </section>
+
+      <Separator />
+
+      {/* Keyboard shortcuts */}
+      <section className="flex flex-col gap-2">
+        <button
+          className="flex items-center gap-2 text-sm font-heading font-semibold text-gold w-fit"
+          onClick={() => setShortcutsOpen((o) => !o)}
+        >
+          Keyboard Shortcuts
+          <ChevronDown size={14} className={cn("transition-transform", shortcutsOpen && "rotate-180")} />
+        </button>
+
+        {shortcutsOpen && (
+          <div className="flex flex-col gap-1 border border-border rounded-lg overflow-hidden">
+            {SHORTCUTS.map(({ keys, label }) => (
+              <div key={label} className="flex items-center justify-between px-3 py-2 border-b border-border last:border-0 bg-obsidian-surface">
+                <span className="text-xs text-warm-gray">{label}</span>
+                <div className="flex gap-1">
+                  {keys.map((k) => (
+                    <kbd key={k} className="text-xs font-mono text-ivory bg-obsidian-raised border border-border rounded px-1.5 py-0.5">{k}</kbd>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <Separator />
@@ -302,7 +410,7 @@ export default function SettingsPage() {
           </code>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <a href="/api/export?format=json" download>
             <Button variant="outline" size="sm">
               <Download size={14} /> Export JSON
@@ -313,7 +421,22 @@ export default function SettingsPage() {
               <Download size={14} /> Export CSV
             </Button>
           </a>
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+            <Upload size={14} /> Import JSON
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImport}
+          />
         </div>
+        {importMsg && (
+          <p className={cn("text-xs", importMsg.includes("failed") ? "text-destructive" : "text-emerald-400")}>
+            {importMsg}
+          </p>
+        )}
 
         <div className="flex flex-col gap-2">
           <label className="text-xs text-warm-gray">Clear Section Data</label>

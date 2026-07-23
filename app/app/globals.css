@@ -133,6 +133,9 @@
 /* Animation speed */
 [data-anim="off"] * { transition: none !important; animation: none !important; }
 
+/* Compact density — scale rem base down slightly */
+html[data-density="compact"] { font-size: 14px; }
+
 /* Pantheon org chart connectors */
 .org-level { display: flex; gap: 2rem; }
 .org-item  { position: relative; display: flex; flex-direction: column; align-items: center; }
