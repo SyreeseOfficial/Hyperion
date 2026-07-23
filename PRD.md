@@ -340,6 +340,61 @@ Four sub-sections:
 
 ---
 
+## Agent Integration
+
+### Vision
+
+Hyperion is the shared workspace for a human + AI team. AI agents can read the board, pick up tasks assigned to them, execute work, and report back — the dashboard shows the shared state for both.
+
+### The Bridge: MCP Server
+
+A lightweight MCP (Model Context Protocol) server wraps Hyperion's existing REST API as named tools. Any MCP-compatible AI client (Claude Code, scheduled Claude agent) gets access to:
+
+| Tool | What it does |
+|---|---|
+| `list_tasks(assignee?)` | Read the Hermes kanban board, optionally filtered to one agent |
+| `update_task(id, status)` | Move a card between columns |
+| `create_task(...)` | Add a new task to the board |
+| `log_session(...)` | Record an AI work session to Prometheus |
+| `list_goals()` | Read active goals from Themis |
+| `post_briefing(content)` | Push a morning briefing to Olympus |
+
+The MCP server lives at `mcp/` in the repo — a thin Node.js wrapper (~100 lines) that translates MCP tool calls into HTTP calls to `localhost:3000/api/*`. No new database layer, no duplication.
+
+### Agent Runtime: Claude Code (Terminal)
+
+**v1 — Terminal is the agent interface.** Each agent is a Claude Code session configured with a system prompt file. Example flow for Hermes:
+
+1. Launch `claude` in terminal with `agents/hermes.md` as system prompt
+2. Hermes calls `list_tasks(assignee: "Hermes")` → sees its queue
+3. Picks a task, executes it using Claude Code's native tools (Bash, Read, Edit, Write)
+4. Calls `update_task(id, "done")` when finished
+5. Calls `log_session(...)` to record the session in Prometheus
+
+The terminal chat window IS the conversation with the agent. The Hyperion UI shows the effect — cards moving, sessions appearing — in real time.
+
+**v2 — Chat UI in Hyperion.** A chat drawer per agent: calls Anthropic API with the agent's system prompt + MCP tools, streams the response into the Hyperion UI. The dashboard becomes the single interface for both human and AI interaction. Deferred until v1 agent loop is proven.
+
+### Pantheon → Real Agents
+
+Each node in the Pantheon org chart maps to:
+
+- A system prompt file at `agents/<name>.md` defining role, personality, and scope
+- Assigned tasks in Hermes (via the `assignee` field)
+- Optionally: a scheduled cron job that wakes the agent, checks its queue, and executes
+
+### What to Build
+
+| Phase | Work | Effort |
+|---|---|---|
+| 1 | `mcp/index.ts` — MCP server wrapping `/api/*` | ~100 lines |
+| 1 | Register MCP in `~/.claude/mcp.json` | 5 lines |
+| 1 | `agents/hermes.md` — Hermes system prompt | 1 file |
+| 2 | Scheduled cron agent — Hermes wakes up and runs automatically | Medium |
+| 3 | Chat UI in Hyperion — talk to agents from the dashboard | Large |
+
+---
+
 ## Out of Scope (v1)
 
 - Habits section
@@ -394,4 +449,4 @@ Four sub-sections:
 
 ---
 
-*Last updated: 2026-07-21*
+*Last updated: 2026-07-23*

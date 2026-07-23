@@ -1,0 +1,10 @@
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Dependencies
+mcp/node_modules/
+
+# Generated
+prd-from-app.md
